@@ -1,4 +1,5 @@
 ﻿using System;
+using sim.Engine;
 
 namespace sim
 {
@@ -6,11 +7,12 @@ namespace sim
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            GameContext gameContext = new GameContext();
 
-            var t = Console.ReadLine();
-
-            Console.WriteLine("Hello: " + t);
+            gameContext.Run();
+            gameContext.Run();
+            gameContext.Run();
+            gameContext.Run();
         }
     }
 }
