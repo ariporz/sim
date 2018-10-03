@@ -17,10 +17,6 @@ namespace sim
             while (!gameContext.Exit)
             {
                 gameContext.Run();
-                // foreach (Player player in gameContext.Players)
-                // {
-                //     player.GetPlayerInput();
-                // }
             }
         }
 
