@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace sim.Engine
 {
@@ -11,152 +12,339 @@ namespace sim.Engine
     //     RoundEnding,
     //     CombatEnding,
     // }
-    public class GameContext : Context
+    public class GameContext
     {
+        private int round = 0;
         private State state;
+        private List<Player> players = new List<Player>();
 
-        public override State CurrentState
+        public event EventHandler StateChanged;
+
+        public State CurrentState
         {
             get => state;
-            set => state = value;
+            set
+            {
+                if (state != value)
+                {
+                    state.Exiting();
+                    OnStateChanged(value);
+                    state = value;
+                    state.Entering();
+                }
+            }
         }
+
+        public bool Exit
+        {
+            get => (CurrentState is CombatEnding);
+        }
+
+        public int Round
+        {
+            get => round;
+            set => round = value;
+        }
+
+        public List<Player> Players { get => players; }
 
         public GameContext()
         {
-            this.state = new CombatStarting(this);
+            state = new CombatStarting(this);
+            players.Add(new HumanPlayer("Bob"));
+            players.Add(new AIPlayer());
         }
 
-        public void UserInput(string userId, string input)
+        public void Run()
         {
-            
+            state.Running();
         }
 
-        public override void Run()
+        protected void OnStateChanged(State newState)
         {
-            this.state.Running();
+            StateChanged?.Invoke(newState, EventArgs.Empty);
+        }
+    }
+
+    public abstract class State
+    {
+        protected GameContext context;
+
+        public event EventHandler StateEvent;
+
+        public GameContext Context
+        {
+            get => context;
+            set => context = value;
+        }
+
+        public string GetName()
+        {
+            return this.ToString();
+        }
+
+        public abstract void Entering();
+        public abstract void Running();
+        public abstract void Exiting();
+        public abstract void UserInput(int userId, int input);
+
+        protected void OnStateEvent(State state)
+        {
+            StateEvent?.Invoke(this, EventArgs.Empty);
         }
     }
 
     public class CombatStarting : State
     {
-        public CombatStarting(State state) : this(state.Context) { }
+        // public CombatStarting(State state) : this(state.Context) { }
 
-        public CombatStarting(Context context)
+        public CombatStarting(GameContext context)
         {
-            this.context = context;
-            Entering();
+            Context = context;
         }
 
-        public override string GetName()
+        public override void Entering()
         {
-            return this.ToString();
-        }
-
-        protected override void Entering()
-        {
-            Console.WriteLine($"Entering - {this.GetName()}");
+            Context.Round = 0;
+            Console.WriteLine($"Entering - {GetName()}");
         }
 
         public override void Running()
         {
-            Console.WriteLine($"Running - {this.GetName()}");
-            StateChangeCheck();
+            Console.WriteLine($"Running - {GetName()}");
+            StateChangeCheck(null);
         }
 
-        protected override void Exiting()
+        public override void Exiting()
         {
-            Console.WriteLine($"Exiting - {this.GetName()}");
+            Console.WriteLine($"Exiting - {GetName()}");
         }
 
-        public override void UserInput(string userId, string input)
+        public override void UserInput(int userId, int input)
         {
+            if (input == 5)
+            {
+                StateChangeCheck(new CombatEnding(Context));
+            }
         }
 
-        private void StateChangeCheck()
+        private void StateChangeCheck(State state)
         {
-            Exiting();
-            context.CurrentState = new RoundStarting(this);
+            if (state != null)
+            {
+                Context.CurrentState = state;
+            }
+            else
+            {
+                Context.CurrentState = new RoundStarting(Context);
+            }
         }
     }
 
     public class RoundStarting : State
     {
-        public RoundStarting(State state)
+        public RoundStarting(GameContext context)
         {
-            this.context = state.Context;
-            Entering();
+            Context = context;
         }
 
-        public override string GetName()
+        public override void Entering()
         {
-            return this.ToString();
-        }
-
-        protected override void Entering()
-        {
-            Console.WriteLine($"Entering - {this.GetName()}");
+            Context.Round += 1;
+            Console.WriteLine($"Entering - {GetName()}");
         }
 
         public override void Running()
         {
-            Console.WriteLine($"Running - {this.GetName()}");
-            StateChangeCheck();
+            Console.WriteLine($"Running - {GetName()}");
+            StateChangeCheck(null);
         }
 
-        protected override void Exiting()
+        public override void Exiting()
         {
-            Console.WriteLine($"Exiting - {this.GetName()}");
+            Console.WriteLine($"Exiting - {GetName()}");
         }
 
-        public override void UserInput(string userId, string input)
+        public override void UserInput(int userId, int input)
         {
-            
+            if (input == 5)
+            {
+                StateChangeCheck(new CombatEnding(Context));
+            }
         }
 
-        private void StateChangeCheck()
+        private void StateChangeCheck(State state)
         {
-            Exiting();
-            context.CurrentState = new AbilitySelecting(this);
+            if (state != null)
+            {
+                Context.CurrentState = state;
+            }
+            else
+            {
+                Context.CurrentState = new AbilitySelecting(Context);
+            }
         }
     }
 
     public class AbilitySelecting : State
     {
-        public AbilitySelecting(State state)
+        public AbilitySelecting(GameContext context)
         {
-            this.context = state.Context;
-            Entering();
+            Context = context;
         }
 
-        public override string GetName()
+        public override void Entering()
         {
-            return this.ToString();
-        }
-
-        protected override void Entering()
-        {
-            Console.WriteLine($"Entering - {this.GetName()}");
+            Console.WriteLine($"Entering - {GetName()}");
         }
 
         public override void Running()
         {
-            Console.WriteLine($"Running - {this.GetName()}");
+            Console.WriteLine($"Running - {GetName()}");
+
+            var complete = true;
+            
+            foreach (Player player in Context.Players)
+            {
+                if (!player.PlayerRoundInputGiven)
+                {
+                    player.GetPlayerInput();
+                }
+            }
+
+            foreach (Player player in Context.Players)
+            {
+                if (!player.PlayerRoundInputGiven)
+                {
+                    complete = false;
+                }
+            }
+
+            StateChangeCheck((complete) ? new AbilityExecuting(Context) : null);
+        }
+
+        public override void Exiting()
+        {
+            Console.WriteLine($"Exiting - {GetName()}");
+        }
+
+        public override void UserInput(int userId, int input)
+        {
+            if (input == 5)
+            {
+                StateChangeCheck(new CombatEnding(Context));
+            }
+        }
+
+        private void StateChangeCheck(State state)
+        {
+            if (state != null)
+            {
+                Context.CurrentState = state;
+            }
+        }
+    }
+
+    public class AbilityExecuting : State
+    {
+        public AbilityExecuting(GameContext context)
+        {
+            Context = context;
+        }
+
+        public override void Entering()
+        {
+            Console.WriteLine($"Entering - {GetName()}");
+            foreach (Player player in Context.Players)
+            {
+                player.PlayerRoundInputGiven = false;
+            }
+        }
+
+        public override void Running()
+        {
+            Console.WriteLine($"Running - {GetName()}");
             StateChangeCheck();
         }
 
-        protected override void Exiting()
+        public override void Exiting()
         {
-            Console.WriteLine($"Exiting - {this.GetName()}");
+            Console.WriteLine($"Exiting - {GetName()}");
         }
 
-        public override void UserInput(string userId, string input)
+        public override void UserInput(int userId, int input)
         {
             
         }
 
         private void StateChangeCheck()
         {
-            Exiting();
+        }
+    }
+
+    public class RoundEnding : State
+    {
+        public RoundEnding(GameContext context)
+        {
+            Context = context;
+        }
+
+        public override void Entering()
+        {
+            Console.WriteLine($"Entering - {GetName()}");
+        }
+
+        public override void Running()
+        {
+            Console.WriteLine($"Running - {GetName()}");
+            StateChangeCheck();
+        }
+
+        public override void Exiting()
+        {
+            Console.WriteLine($"Exiting - {GetName()}");
+        }
+
+        public override void UserInput(int userId, int input)
+        {
+            
+        }
+
+        private void StateChangeCheck()
+        {
+        }
+    }
+
+    public class CombatEnding : State
+    {
+        public CombatEnding(GameContext context)
+        {
+            Context = context;
+        }
+
+        public override void Entering()
+        {
+            Console.WriteLine($"Entering - {GetName()}");
+        }
+
+        public override void Running()
+        {
+            Console.WriteLine($"Running - {GetName()}");
+            StateChangeCheck();
+        }
+
+        public override void Exiting()
+        {
+            Console.WriteLine($"Exiting - {GetName()}");
+        }
+
+        public override void UserInput(int userId, int input)
+        {
+            
+        }
+
+        private void StateChangeCheck()
+        {
         }
     }
 }

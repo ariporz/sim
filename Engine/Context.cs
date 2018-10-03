@@ -2,27 +2,48 @@ using System;
 
 namespace sim.Engine
 {
-    public abstract class Context
-    {
-        public abstract State CurrentState { get;  set; }
+    // public abstract class Context
+    // {
+    //     public event EventHandler StateChanged;
+    //     //public abstract event EventHandler GetPlayerInput;
 
-        public abstract void Run();
-    }
+    //     public abstract State CurrentState { get; set; }
 
-    public abstract class State
-    {
-        protected Context context;
+    //     public abstract void Run();
 
-        public Context Context
-        {
-            get => context;
-            set => context = value;
-        }
+    //     // public abstract void AskForInput();
 
-        public abstract string GetName();
-        protected abstract void Entering();
-        public abstract void Running();
-        protected abstract void Exiting();
-        public abstract void UserInput(string userId, string input);
-    }
+    //     protected void OnStateChanged(State newState)
+    //     {
+    //         StateChanged?.Invoke(newState, EventArgs.Empty);
+    //     }
+    // }
+
+    // public abstract class State
+    // {
+    //     protected GameContext context;
+
+    //     public event EventHandler StateEvent;
+
+    //     public GameContext Context
+    //     {
+    //         get => context;
+    //         set => context = value;
+    //     }
+
+    //     public string GetName()
+    //     {
+    //         return this.ToString();
+    //     }
+
+    //     protected abstract void Entering();
+    //     public abstract void Running();
+    //     protected abstract void Exiting();
+    //     public abstract void UserInput(string userId, string input);
+
+    //     protected void OnStateEvent(State state)
+    //     {
+    //         StateEvent?.Invoke(this, EventArgs.Empty);
+    //     }
+    // }
 }
