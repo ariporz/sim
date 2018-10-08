@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace sim.Engine
 {
@@ -11,6 +12,9 @@ namespace sim.Engine
 
         public bool PlayerRoundInputGiven { get; set; }
         public int PlayerRoundInput { get; protected set; }
+
+        public List<Pet> ActivePets { get; protected set; }
+        public int ActiveSlot { get; protected set; }
 
         public abstract void GetPlayerInput();
 
@@ -26,6 +30,16 @@ namespace sim.Engine
         {
             PlayerId = 1;
             PlayerName = playerName;
+            ActivePets = new List<Pet>();
+            List<Spell> spells = new List<Spell>();
+            spells.Add(new Bite(1, "Bite", TargetType.Direct));
+            spells.Add(new Bite(5, "Big Bite", TargetType.Area));
+            ActivePets.Add(new Pet(PetFamily.Beast, "Big Dog", spells));
+            spells = new List<Spell>();
+            spells.Add(new Bite(3, "Scratch", TargetType.Direct));
+            spells.Add(new Heal(6, "Healing Prayer", TargetType.Area));
+            ActivePets.Add(new Pet(PetFamily.Critter, "Small Mouse", spells));
+            ActiveSlot = 0;
         }
 
         public override void GetPlayerInput()
@@ -52,6 +66,16 @@ namespace sim.Engine
         {
             PlayerId = 0;
             PlayerName = "Roboter";
+            ActivePets = new List<Pet>();
+            List<Spell> spells = new List<Spell>();
+            spells.Add(new Bite(1, "Bite", TargetType.Direct));
+            spells.Add(new Heal(2, "Heal", TargetType.Direct));
+            ActivePets.Add(new Pet(PetFamily.Beast, "Dog", spells));
+            spells = new List<Spell>();
+            spells.Add(new Bite(3, "Scratch", TargetType.Direct));
+            spells.Add(new Heal(4, "Squeal", TargetType.Direct));
+            ActivePets.Add(new Pet(PetFamily.Critter, "Mouse", spells));
+            ActiveSlot = 0;
         }
 
         public override void GetPlayerInput()

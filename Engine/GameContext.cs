@@ -106,18 +106,19 @@ namespace sim.Engine
         public override void Entering()
         {
             Context.Round = 0;
-            Console.WriteLine($"Entering - {GetName()}");
+            // Console.WriteLine($"Entering - {GetName()}");
         }
 
         public override void Running()
         {
-            Console.WriteLine($"Running - {GetName()}");
+            Console.WriteLine($"Combat started, teams locked.");
+            // Console.WriteLine($"Running - {GetName()}");
             StateChangeCheck(null);
         }
 
         public override void Exiting()
         {
-            Console.WriteLine($"Exiting - {GetName()}");
+            // Console.WriteLine($"Exiting - {GetName()}");
         }
 
         public override void UserInput(int userId, int input)
@@ -151,18 +152,19 @@ namespace sim.Engine
         public override void Entering()
         {
             Context.Round += 1;
-            Console.WriteLine($"Entering - {GetName()}");
+            // Console.WriteLine($"Entering - {GetName()}");
         }
 
         public override void Running()
         {
-            Console.WriteLine($"Running - {GetName()}");
+            // Console.WriteLine($"Running - {GetName()}");
+            Console.WriteLine($"Round: {Context.Round}");
             StateChangeCheck(null);
         }
 
         public override void Exiting()
         {
-            Console.WriteLine($"Exiting - {GetName()}");
+            // Console.WriteLine($"Exiting - {GetName()}");
         }
 
         public override void UserInput(int userId, int input)
@@ -195,12 +197,12 @@ namespace sim.Engine
 
         public override void Entering()
         {
-            Console.WriteLine($"Entering - {GetName()}");
+            // Console.WriteLine($"Entering - {GetName()}");
         }
 
         public override void Running()
         {
-            Console.WriteLine($"Running - {GetName()}");
+            // Console.WriteLine($"Running - {GetName()}");
 
             var complete = true;
             
@@ -225,7 +227,7 @@ namespace sim.Engine
 
         public override void Exiting()
         {
-            Console.WriteLine($"Exiting - {GetName()}");
+            // Console.WriteLine($"Exiting - {GetName()}");
         }
 
         public override void UserInput(int userId, int input)
@@ -254,7 +256,7 @@ namespace sim.Engine
 
         public override void Entering()
         {
-            Console.WriteLine($"Entering - {GetName()}");
+            // Console.WriteLine($"Entering - {GetName()}");
             foreach (Player player in Context.Players)
             {
                 player.PlayerRoundInputGiven = false;
