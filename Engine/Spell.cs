@@ -11,6 +11,7 @@ namespace sim.Engine
 
     public enum DispelType
     {
+        None,
         Magic,
     }
 
@@ -34,6 +35,10 @@ namespace sim.Engine
             TargetType = targetType;
             DispelType = dispelType;
             Effects = effects;
+        }
+
+        public void Cast()
+        {
         }
     }
 

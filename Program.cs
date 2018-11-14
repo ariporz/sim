@@ -11,7 +11,6 @@ namespace sim
         {
             Input input = new Input();
             input.InputReceived += gameContext_InputReceived;
-
             gameContext.StateChanged += gameContext_StateChanged;
 
             while (!gameContext.Exit)

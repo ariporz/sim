@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace sim.Engine
 {
@@ -19,6 +20,9 @@ namespace sim.Engine
         public int Ticks { get; protected set; }
         public int Duration { get; protected set; }
         public float Power { get; protected set; }
+        
+        public int SourceId { get; protected set; }
+        public List<int> TargetIds { get; protected set; }
 
         private int accumulated;
 

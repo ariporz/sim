@@ -5,6 +5,7 @@ namespace sim.Engine
 {
     public abstract class Player
     {
+        // TODO: Add ability queue, not every turn requires input.
         public event EventHandler InputReceived;
 
         public int PlayerId { get; protected set; }
@@ -13,14 +14,24 @@ namespace sim.Engine
         public bool PlayerRoundInputGiven { get; set; }
         public int PlayerRoundInput { get; protected set; }
 
-        public List<Pet> ActivePets { get; protected set; }
-        public int ActiveSlot { get; protected set; }
+        public Dictionary<int, Pet> ActivePets { get; protected set; }
+        public int ActiveId { get; protected set; }
 
         public abstract void GetPlayerInput();
 
         protected virtual void OnInputReceived()
         {
             InputReceived?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void SetActivePet(int id)
+        {
+            ActiveId = id;
+        }
+
+        public void AddAbilityToQueue(int index)
+        {
+            //ActivePets[ActiveId].Spells[index];
         }
     }
 
@@ -30,16 +41,10 @@ namespace sim.Engine
         {
             PlayerId = 1;
             PlayerName = playerName;
-            ActivePets = new List<Pet>();
-            List<Spell> spells = new List<Spell>();
-            spells.Add(new Bite(1, "Bite", TargetType.Direct));
-            spells.Add(new Bite(5, "Big Bite", TargetType.Area));
-            ActivePets.Add(new Pet(PetFamily.Beast, "Big Dog", spells));
-            spells = new List<Spell>();
-            spells.Add(new Bite(3, "Scratch", TargetType.Direct));
-            spells.Add(new Heal(6, "Healing Prayer", TargetType.Area));
-            ActivePets.Add(new Pet(PetFamily.Critter, "Small Mouse", spells));
-            ActiveSlot = 0;
+            ActivePets = new Dictionary<int, Pet>();
+            ActivePets.Add(Library.GetPetById(2).Id, Library.GetPetById(2));
+            ActivePets.Add(Library.GetPetById(1).Id, Library.GetPetById(1));
+            ActiveId = 2;
         }
 
         public override void GetPlayerInput()
@@ -66,16 +71,10 @@ namespace sim.Engine
         {
             PlayerId = 0;
             PlayerName = "Roboter";
-            ActivePets = new List<Pet>();
-            List<Spell> spells = new List<Spell>();
-            spells.Add(new Bite(1, "Bite", TargetType.Direct));
-            spells.Add(new Heal(2, "Heal", TargetType.Direct));
-            ActivePets.Add(new Pet(PetFamily.Beast, "Dog", spells));
-            spells = new List<Spell>();
-            spells.Add(new Bite(3, "Scratch", TargetType.Direct));
-            spells.Add(new Heal(4, "Squeal", TargetType.Direct));
-            ActivePets.Add(new Pet(PetFamily.Critter, "Mouse", spells));
-            ActiveSlot = 0;
+            ActivePets = new Dictionary<int, Pet>();
+            ActivePets.Add(Library.GetPetById(1).Id, Library.GetPetById(1));
+            ActivePets.Add(Library.GetPetById(2).Id, Library.GetPetById(2));
+            ActiveId = 1;
         }
 
         public override void GetPlayerInput()

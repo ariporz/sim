@@ -5,6 +5,7 @@ namespace sim.Engine
 {
     // public enum OldState
     // {
+    //     Idle,
     //     CombatStarting,
     //     RoundStarting,
     //     AbilitySelecting,
@@ -68,14 +69,17 @@ namespace sim.Engine
 
     public abstract class State
     {
-        protected GameContext context;
+        //protected GameContext context;
+        protected CombatContext combat;
 
         public event EventHandler StateEvent;
 
-        public GameContext Context
+        protected GameContext Context { get; set; }
+
+        protected CombatContext CombatContext
         {
-            get => context;
-            set => context = value;
+            get => combat;
+            set => combat = value;
         }
 
         public string GetName()
